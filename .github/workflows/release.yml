@@ -29,6 +29,7 @@ jobs:
         run: |
           bash -n install-api-netbird.sh
           bash -n get-api-netbird.sh
+          bash -n uninstall-legacy.sh
 
       - name: Compilar
         run: |
@@ -38,7 +39,7 @@ jobs:
               -ldflags "-s -w -X main.version=${GITHUB_REF_NAME}" \
               -o dist/api-netbird-clients_linux_$arch .
           done
-          cp install-api-netbird.sh get-api-netbird.sh dist/
+          cp install-api-netbird.sh get-api-netbird.sh uninstall-legacy.sh dist/
           cd dist && for f in *; do sha256sum "$f" > "$f.sha256"; done && ls -la
 
       - name: Publicar release

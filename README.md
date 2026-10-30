@@ -9,6 +9,18 @@ Se instala con Docker en cada equipo que tenga NetBird (los colectores de la ofi
 - **Imagen `scratch` de unos 7 MB**: solo el binario estático. Sin shell, sistema de archivos de solo lectura y únicamente la capability `NET_RAW` para el ping.
 - **Sin colector ni base de datos**: lee `netbird status --json` del daemon local, lo cachea 10 s y responde.
 
+## Antes de instalar: quitar la API anterior
+
+Si el equipo tenía la API vieja (`netbird-monitor`, HTTP :8080), hay que revisar cómo quedó instalada. Puede estar como servicio systemd, contenedor, proceso suelto o en cron. Este script primero solo muestra lo que encuentra:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/cloudfactorybo/Api_Netbird_Clients/main/uninstall-legacy.sh -o uninstall-legacy.sh
+sudo bash uninstall-legacy.sh            # revisa y muestra, no cambia nada
+sudo bash uninstall-legacy.sh --borrar   # respalda en /root/api-netbird-legacy-*.tar.gz y quita
+```
+
+`netbird-agent` (:9092, el inventario que consultan las Orange Pi) **no** se quita, porque esta API no lo reemplaza. Para quitarlo también hay que agregar `--incluir-inventario`. El cliente NetBird no se toca nunca.
+
 ## Instalación
 
 En el equipo con NetBird (Linux amd64 o arm64, con Docker y compose v2):

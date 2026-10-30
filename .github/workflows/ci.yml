@@ -25,4 +25,5 @@ jobs:
         run: |
           bash -n install-api-netbird.sh
           bash -n get-api-netbird.sh
-          shellcheck -S warning install-api-netbird.sh get-api-netbird.sh
+          bash -n uninstall-legacy.sh
+          shellcheck -S warning install-api-netbird.sh get-api-netbird.sh uninstall-legacy.sh
