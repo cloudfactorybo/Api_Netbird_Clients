@@ -168,7 +168,7 @@ if [ -f "${INSTALL_DIR}/.env" ]; then
     echo -e "${YELLOW}📦 INSTALACIÓN EXISTENTE en ${INSTALL_DIR}${NC}"
     BACKUP_DIR="${INSTALL_DIR}/backup-$(date +%Y%m%d-%H%M%S)"
     mkdir -p "$BACKUP_DIR"
-    for f in .env docker-compose.yml Dockerfile data/tls; do
+    for f in .env compose.yaml docker-compose.yml Dockerfile data/tls; do
         [ -e "${INSTALL_DIR}/$f" ] && cp -a "${INSTALL_DIR}/$f" "$BACKUP_DIR/"
     done
     chmod 700 "$BACKUP_DIR"
@@ -352,7 +352,7 @@ EOF
 CAP_EXTRA=""
 [ "$API_PORT" -lt 1024 ] && CAP_EXTRA="      - NET_BIND_SERVICE"
 
-cat > docker-compose.yml <<EOF
+cat > compose.yaml <<EOF
 # Generado por install-api-netbird.sh — ${VERSION}
 name: ${BIN_NAME}
 
@@ -399,7 +399,9 @@ ${CAP_EXTRA}
         max-size: "10m"
         max-file: "3"
 EOF
-sed -i '/^$/N;/^\n$/D' docker-compose.yml
+sed -i '/^$/N;/^\n$/D' compose.yaml
+# Instalaciones v1.0.0 usaban docker-compose.yml: se quita para no tener dos.
+rm -f docker-compose.yml
 
 umask 077
 cat > .env <<EOF
@@ -434,28 +436,29 @@ cat > comandos.sh <<'EOF'
 #!/bin/bash
 # Atajos para operar api-netbird-clients. Uso: ./comandos.sh <acción>
 cd "$(dirname "$0")"
+dc() { docker compose -f compose.yaml --project-directory . "$@"; }
 TOKEN=$(grep -E '^API_TOKEN=' .env | cut -d= -f2-)
 PORT=$(grep -E '^API_PORT=' .env | cut -d= -f2-)
 IP=$(grep -E '^LISTEN_ADDRS=' .env | cut -d= -f2- | cut -d, -f1 | cut -d: -f1)
 [ "$IP" = "0.0.0.0" ] && IP=127.0.0.1
 URL="https://${IP}:${PORT}"
 case "$1" in
-    estado)     docker compose ps; curl -sk -H "X-API-Key: $TOKEN" "$URL/api/v1/health"; echo ;;
-    logs)       docker compose logs -f --tail 100 ;;
+    estado)     dc ps; curl -sk -H "X-API-Key: $TOKEN" "$URL/api/v1/health"; echo ;;
+    logs)       dc logs -f --tail 100 ;;
     status)     curl -sk -H "X-API-Key: $TOKEN" "$URL/api/v1/status" ;;
     peers)      curl -sk -H "X-API-Key: $TOKEN" "$URL/api/v1/peers?status=connected" ;;
     ping)       curl -sk -H "X-API-Key: $TOKEN" "$URL/api/v1/ping" ;;
     metrics)    curl -sk -H "X-API-Key: $TOKEN" "$URL/metrics" ;;
     token)      echo "$TOKEN" ;;
-    cert)       docker compose exec -T api /api-netbird-clients cert-info ;;
-    cert-pem)   docker compose exec -T api /api-netbird-clients cert-info --pem ;;
+    cert)       dc exec -T api /api-netbird-clients cert-info ;;
+    cert-pem)   dc exec -T api /api-netbird-clients cert-info --pem ;;
     renovar-cert)
-        rm -f data/tls/server.crt data/tls/server.key && docker compose restart \
+        rm -f data/tls/server.crt data/tls/server.key && dc restart \
             && echo "Certificado nuevo: actualiza la huella en los consumidores (./comandos.sh cert)" ;;
-    reiniciar)  docker compose restart ;;
+    reiniciar)  dc restart ;;
     desinstalar)
         read -r -p "¿Borrar contenedor e imagen? Los archivos quedan en $(pwd) (s/N): " R
-        [[ $R =~ ^[Ss] ]] && docker compose down --rmi local ;;
+        [[ $R =~ ^[Ss] ]] && dc down --rmi local ;;
     *) echo "Uso: $0 {estado|logs|status|peers|ping|metrics|token|cert|cert-pem|renovar-cert|reiniciar|desinstalar}" ;;
 esac
 EOF
@@ -466,8 +469,10 @@ chmod 750 comandos.sh
 # ============================================================
 echo ""
 echo -e "${YELLOW}🚀 CONSTRUYENDO Y ARRANCANDO${NC}"
-docker compose build -q >/dev/null || fail "Falló la construcción de la imagen"
-docker compose up -d --force-recreate >/dev/null || fail "No se pudo arrancar el contenedor (docker compose logs)"
+# -f explícito: no depende de cómo cada versión de compose busca el archivo.
+dc() { docker compose -f "${INSTALL_DIR}/compose.yaml" --project-directory "${INSTALL_DIR}" "$@"; }
+dc build -q >/dev/null || fail "Falló la construcción de la imagen"
+dc up -d --force-recreate >/dev/null || fail "No se pudo arrancar el contenedor (./comandos.sh logs)"
 ok "Contenedor ${BIN_NAME} arrancado"
 
 ESTADO=""
@@ -481,7 +486,7 @@ if [ "$ESTADO" = "healthy" ]; then
     ok "Healthcheck: healthy"
 else
     warn "El contenedor no quedó healthy (estado: ${ESTADO:-detenido}). Últimos logs:"
-    docker compose logs --tail 20 2>&1 | sed 's/^/      /'
+    dc logs --tail 20 2>&1 | sed 's/^/      /'
 fi
 
 PRUEBA=$(curl -sk --max-time 20 -H "X-API-Key: ${API_TOKEN}" "https://${PRIMER_IP}:${API_PORT}/api/v1/health" 2>/dev/null || true)
@@ -491,7 +496,7 @@ else
     warn "La prueba HTTPS a https://${PRIMER_IP}:${API_PORT}/api/v1/health no respondió."
 fi
 
-CERT_JSON=$(docker compose exec -T api "/${BIN_NAME}" cert-info 2>/dev/null || true)
+CERT_JSON=$(dc exec -T api "/${BIN_NAME}" cert-info 2>/dev/null || true)
 FP=$(echo "$CERT_JSON" | grep -oE '"sha256": *"[0-9a-f]{64}"' | grep -oE '[0-9a-f]{64}' || true)
 VENCE=$(echo "$CERT_JSON" | grep -oE '"not_after": *"[^"]*"' | sed 's/.*"\([^"]*\)"$/\1/' || true)
 

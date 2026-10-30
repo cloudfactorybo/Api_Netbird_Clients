@@ -10,6 +10,7 @@ data/
 backup-*/
 bin/
 docker-compose.yml
+compose.yaml
 comandos.sh
 *.pem
 *.key

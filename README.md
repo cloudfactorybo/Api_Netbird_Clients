@@ -39,7 +39,7 @@ El script baja el instalador de la última release, verifica su SHA-256 y lo eje
    - la vigencia del certificado;
    - si activar el ping.
 3. **Muestra un resumen editable**, igual que en `kafka-installer`.
-4. **Descarga el binario de la release** y verifica su SHA-256. Luego genera `Dockerfile`, `docker-compose.yml`, `.env` (600) y `comandos.sh`.
+4. **Descarga el binario de la release** y verifica su SHA-256. Luego genera `Dockerfile`, `compose.yaml`, `.env` (600) y `comandos.sh`.
 5. **Construye la imagen, la arranca y la prueba**: espera al healthcheck y hace una consulta HTTPS con el token. Al final muestra la URL, el token y la **huella SHA-256 del certificado**.
 
 **Otras formas de ejecutarlo:**
