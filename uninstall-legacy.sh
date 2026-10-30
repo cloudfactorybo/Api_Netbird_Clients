@@ -141,7 +141,7 @@ for x in $Q_UNITS $Q_CONTS $Q_RUTAS; do item "$x"; done
 for p in $Q_PIDS; do item "proceso $p"; done
 [ -n "$Q_CRON" ] && echo "$Q_CRON" | while read -r l; do item "cron: $l"; done
 if [ $BORRAR -eq 0 ]; then
-    echo -e "\n${BLUE}Solo revisión: no se cambió nada.${NC} Para quitarlo:  ${GREEN}sudo $0 --borrar${NC}"
+    echo -e "\n${BLUE}Solo revisión: no se cambió nada.${NC} Para quitarlo:  ${GREEN}sudo bash $0 --borrar${NC}"
     exit 0
 fi
 
