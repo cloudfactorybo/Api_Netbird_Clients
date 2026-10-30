@@ -1,0 +1,20 @@
+# Binarios
+/api-netbird-clients
+/dist/
+*.exe
+
+# Lo que genera el instalador: contiene el token y la clave TLS.
+# NUNCA debe subirse al repositorio.
+.env
+data/
+backup-*/
+bin/
+docker-compose.yml
+comandos.sh
+*.pem
+*.key
+*.crt
+*.bak
+
+# Local
+.claude/

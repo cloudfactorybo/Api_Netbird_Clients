@@ -1,0 +1,85 @@
+{
+  "peers": {
+    "total": 3,
+    "connected": 2,
+    "details": [
+      {
+        "fqdn": "cliente-elk.netbird.selfhosted",
+        "netbirdIp": "100.64.0.10",
+        "publicKey": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE=",
+        "status": "Connected",
+        "lastStatusUpdate": "2026-10-30T15:00:00Z",
+        "connectionType": "P2P",
+        "iceCandidateType": { "local": "host", "remote": "srflx" },
+        "iceCandidateEndpoint": { "local": "192.168.1.10:49411", "remote": "203.0.113.10:51820" },
+        "relayAddress": "rels://relay.example.com:443",
+        "lastWireguardHandshake": "2026-10-30T15:09:00Z",
+        "transferReceived": 199443302,
+        "transferSent": 9856000,
+        "latency": 14194799,
+        "quantumResistance": false,
+        "networks": []
+      },
+      {
+        "fqdn": "router-cliente.netbird.selfhosted",
+        "netbirdIp": "100.64.0.20",
+        "publicKey": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAI=",
+        "status": "Connected",
+        "lastStatusUpdate": "2026-10-30T14:00:00Z",
+        "connectionType": "Relayed",
+        "iceCandidateType": { "local": "", "remote": "" },
+        "iceCandidateEndpoint": { "local": "", "remote": "" },
+        "relayAddress": "rels://netbird.example.com:443",
+        "lastWireguardHandshake": "2026-10-30T15:00:00Z",
+        "transferReceived": 1000,
+        "transferSent": 2000,
+        "latency": 98765432,
+        "quantumResistance": false,
+        "networks": ["192.168.50.10/32", "192.168.50.11/32"]
+      },
+      {
+        "fqdn": "laptop-apagada.netbird.selfhosted",
+        "netbirdIp": "100.64.0.30",
+        "publicKey": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM=",
+        "status": "Idle",
+        "lastStatusUpdate": "2026-10-29T10:00:00Z",
+        "connectionType": "-",
+        "iceCandidateType": { "local": "", "remote": "" },
+        "iceCandidateEndpoint": { "local": "", "remote": "" },
+        "relayAddress": "",
+        "lastWireguardHandshake": "0001-01-01T00:00:00Z",
+        "transferReceived": 0,
+        "transferSent": 0,
+        "latency": 0,
+        "quantumResistance": false,
+        "networks": null
+      }
+    ]
+  },
+  "cliVersion": "0.79.0",
+  "daemonVersion": "0.79.0",
+  "daemonStatus": "Connected",
+  "management": { "url": "https://netbird.example.com:443", "connected": true, "error": "" },
+  "signal": { "url": "https://netbird.example.com:443", "connected": true, "error": "" },
+  "relays": {
+    "total": 2,
+    "available": 2,
+    "details": [
+      { "uri": "rels://netbird.example.com:443", "available": true, "error": "", "transport": "ws" },
+      { "uri": "rels://relay.example.com:443", "available": true, "error": "", "transport": "quic" }
+    ]
+  },
+  "netbirdIp": "100.64.0.1/16",
+  "publicKey": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQ=",
+  "usesKernelInterface": true,
+  "wireguardPort": 51820,
+  "fqdn": "colector01.netbird.selfhosted",
+  "quantumResistance": false,
+  "quantumResistancePermissive": false,
+  "networks": [],
+  "forwardingRules": 0,
+  "dnsServers": [],
+  "events": [],
+  "lazyConnectionEnabled": false,
+  "profileName": "default"
+}
